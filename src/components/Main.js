@@ -5,7 +5,8 @@ import {
   FlatList,
   StyleSheet,
   ScrollView,
-  Alert
+  Alert,
+  Text
 } from 'react-native';
 
 import { 
@@ -22,7 +23,9 @@ import axios from 'axios'
 export default class Main extends Component {
   state = {
     todos: [],
-    name: ''
+    name: '',
+    newTodo: '',
+    addNew: false
   }
   
   getTodoList() {
@@ -63,11 +66,18 @@ export default class Main extends Component {
     }
     axios
       .post(
-        `POST https://api.fake.rest/189bf93b-4d78-4f00-86ac-76d87cfccbd1/task/add`,
+        `https://api.fake.rest/189bf93b-4d78-4f00-86ac-76d87cfccbd1/task/add`,
         data
       )
       .then(res =>
-        alert(res.data.data)
+        this.setState({
+          newTodo: data.name,
+          addNew: true
+        })
+        
+      )
+      .then( res =>
+        alert("success add new list" + data.name)
       )
       .catch(err => {
         throw err;
@@ -114,11 +124,33 @@ export default class Main extends Component {
                       checkedIcon='check-circle'
                       uncheckedIcon='check'
                     />}
-                />
+                />  
               </View>  
-            }
+            }     
             keyExtractor={({ id }) => id}
           />
+          {this.state.addNew ? (        
+            <ListItem
+            title={this.state.newTodo}
+            bottomDivider
+            rightIcon={
+              <Icon
+                raised
+                name='trash'
+                type='font-awesome'
+                color='#f50'
+                onPress={() => this.delete(item.id)} />}
+            leftIcon={
+              <CheckBox
+                left
+                checkedIcon='check-circle'
+                uncheckedIcon='check'
+              />}
+            />
+          ) : (
+            <Text>    </Text>
+            )
+          } 
         </ScrollView>
       </View>
     )
